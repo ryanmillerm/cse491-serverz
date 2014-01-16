@@ -20,4 +20,10 @@ while True:
     print 'Got connection from', client_host, client_port
     c.send('Thank you for connecting')
     c.send("good bye.")
+    c.send("HTTP/1.0 200 OK\r\n")
+    c.send("Date: " + time.asctime(time.gmtime()) + "\r\n")
+    c.send("Content-Type: text/html\r\n\r\n")
+    c.send("<html>")
+    c.send("<h1> Hello, world!")
+    c.send("</html>")
     c.close()
