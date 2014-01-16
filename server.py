@@ -19,7 +19,8 @@ while True:
     c, (client_host, client_port) = s.accept()
     print 'Got connection from', client_host, client_port
     c.send('HTTP/1.0 200 OK\r\n')
-    c.send('<html><body><h1>Hello World</body></html>')
+    c.send('Context-type: text/html')
+    c.send('<html><body><h1>Hello World</h1></body></html>')
     c.send('Thank you for connecting')
     c.send("good bye.")
     c.close()
