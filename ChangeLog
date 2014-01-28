@@ -4,3 +4,8 @@
  * Initialized repository, created server.py and README.
 
  * hw2, added some unit tests
+
+2014-01-28
+
+ * fixed HW2 - added ability handle POST requests
+   and added test case for POSTs

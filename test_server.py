@@ -1,10 +1,12 @@
 import server
 
+
 class FakeConnection(object):
     """
     A fake connection class that mimics a real TCP socket for the purpose
     of testing socket I/O.
     """
+
     def __init__(self, to_recv):
         self.to_recv = to_recv
         self.sent = ""
@@ -15,7 +17,7 @@ class FakeConnection(object):
             r = self.to_recv
             self.to_recv = ""
             return r
-            
+
         r, self.to_recv = self.to_recv[:n], self.to_recv[n:]
         return r
 
@@ -29,11 +31,17 @@ class FakeConnection(object):
 
 def test_handle_connection():
     conn = FakeConnection("GET / HTTP/1.0\r\n\r\n")
-    expected_return = 'HTTP/1.0 200 OK\r\n' + \
-                      'Content-type: text/html\r\n' + \
-                      '\r\n' + \
-                      '<h1>Hello, world.</h1>' + \
-                      'This is ctb\'s Web server.'
+    expected_return = ('HTTP/1.0 200 OK\r\n' + 'Content-type: text/html\r\n' + \
+                  '\r\n' + \
+                  '<body>'
+                  '<h1>Hello, world.</h1>' + \
+                  '<p>'
+                  'This is Ryan Miller\'s (mill1256) Web server.</br>' + \
+                  '&nbsp&nbsp<a href=/content>Content</a></br>' + \
+                  '&nbsp&nbsp<a href=/file>File</a></br>' + \
+                  '&nbsp&nbsp<a href=/image>Image</a></br>' + \
+                  '</p>'
+                  '</body>')
 
     server.handle_connection(conn)
     assert conn.sent == expected_return, 'Got: %s' % (repr(conn.sent),)
@@ -65,3 +73,14 @@ def test_handle_image_connection():
 
     server.handle_connection(conn)
     assert conn.sent == expected_return, 'Got: %s' % (repr(conn.sent),)
+
+def test_handle_post_request():
+    conn = FakeConnection("POST / HTTP/1.0\r\n\r\n")
+    expected_return = 'HTTP/1.0 200 OK\r\n' + \
+                      'Content-type: text/html\r\n' + \
+                      '\r\n' + \
+                      '<h1>Hello, world!</h1>'
+
+    server.handle_connection(conn)
+    assert conn.sent == expected_return, 'Got: %s' % (repr(conn.sent),)
+
