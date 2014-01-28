@@ -20,3 +20,10 @@ Next, go to your cse491-serverz directory and run server.py::
    python server.py
 
 Use CTRL-C to quit the server.
+
+   push:  git push origin master
+   swap branches: git checkout branchname  (-b for new branch)
+   push into github: git push origin master:other
+       where master is the master branch and other is the name of hithub branch
+         - these can match, or not.  easier if you keep them consistent tho
+
