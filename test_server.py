@@ -121,17 +121,16 @@ def test_handle_form_valid_submission():
     assert conn.sent == expected_return, 'Got: %s' % (repr(conn.sent),)
 
 
-# def test_handle_form_post():
-#     conn = FakeConnection("POST /form HTTP/1.0\r\n\r\n")
-#     expected_return = ('HTTP/1.0 200 OK\r\n' +
-#                        'Content-type: text/html\r\n' +
-#                        '\r\n' +
-#                        '<h1>Hi Ryan Miller</h1>')
-#
-#     server.handle_connection(conn)
-#     print expected_return
-#     print repr(conn.sent)
-#     assert conn.sent == expected_return, 'Got: %s' % (repr(conn.sent),)
+def test_handle_form_post():
+    conn = FakeConnection("POST /form/submit? HTTP/1.0"
+                          "&firstname=Ryan&lastname=Miller")
+    expected_return = ('HTTP/1.0 200 OK\r\n' +
+                       'Content-type: text/html\r\n' +
+                       '\r\n' +
+                       '<h1>Hi Ryan Miller</h1>')
+
+    server.handle_connection(conn)
+    assert conn.sent == expected_return, 'Got: %s' % (repr(conn.sent),)
 
 
 def test_handle_form_invalid_submission():
