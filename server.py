@@ -2,6 +2,9 @@
 import random
 import socket
 import time
+import urlparse
+
+
 
 def main():
     s = socket.socket()         # Create a socket object
@@ -44,6 +47,34 @@ def handle_connection(conn):
                   'Content-type: text/html\r\n' + \
                   '\r\n' + \
                   '<h1>image path!</h1>')
+    elif('GET /form' in socketData):
+        conn.send("HTTP/1.0 200 OK\r\n" + \
+                  "Content-type: text/html\r\n"
+                  "\r\n" + \
+                  "<form action='/submit' method='GET'>" +  \
+                  "First Name: <input type='text' name='firstname'></br>" + \
+                  "Last Name: <input type='text' name='lastname'></br>" + \
+                  "<button name='submitButton' type='submit'>Submit</button>" + \
+                  "</form>")
+    elif('/submit' in socketData):
+         parsed_url = urlparse.urlparse(socketData)
+         try:    
+           #protect against empty inputs
+           first_name = urlparse.parse_qs(parsed_url.query)['firstname'][0]
+           last_name = urlparse.parse_qs(parsed_url.query)['lastname'][0]
+           conn.send('HTTP/1.0 200 OK\r\n' + \
+                     'Content-type: text/html\r\n' + \
+                     '\r\n')
+           conn.send('<h1>Hi %s %s</h1>' % (first_name, last_name))
+         except:
+            #if except block is hit, one or more of the fields were empty
+            conn.send('HTTP/1.0 200 OK\r\n' + \
+                      'Content-type: text/html\r\n' + \
+                      '\r\n')
+            conn.send('<h1>Warning, first and last name must be entered</h1>')
+            #@question - why does following link not direct to the home
+            #page on the first attempt, but does on the 2nd attempt? 
+            #conn.send('<a href=/>Home</a>')
     else:
         conn.send('HTTP/1.0 200 OK\r\n' + 'Content-type: text/html\r\n' + \
                   '\r\n' + \
@@ -54,6 +85,7 @@ def handle_connection(conn):
                   '&nbsp&nbsp<a href=/content>Content</a></br>' + \
                   '&nbsp&nbsp<a href=/file>File</a></br>' + \
                   '&nbsp&nbsp<a href=/image>Image</a></br>' + \
+                  '&nbsp&nbsp<a href=/form>Form</a></br>' + \
                   '</p>'
                   '</body>')
 

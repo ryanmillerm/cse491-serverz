@@ -40,6 +40,7 @@ def test_handle_connection():
                   '&nbsp&nbsp<a href=/content>Content</a></br>' + \
                   '&nbsp&nbsp<a href=/file>File</a></br>' + \
                   '&nbsp&nbsp<a href=/image>Image</a></br>' + \
+                  '&nbsp&nbsp<a href=/form>Form</a></br>' + \
                   '</p>'
                   '</body>')
 
@@ -48,19 +49,20 @@ def test_handle_connection():
 
 def test_handle_content_connection():
     conn = FakeConnection("GET /content HTTP/1.0\r\n\r\n")
-    expected_return = 'HTTP/1.0 200 OK\r\n' + \
+    expected_return = ('HTTP/1.0 200 OK\r\n' + \
                       'Content-type: text/html\r\n' + \
                       '\r\n' + \
-                      '<h1>Content path!</h1>'
+                      '<h1>Content path!</h1>')
+
     server.handle_connection(conn)
     assert conn.sent == expected_return, 'Got: %s' % (repr(conn.sent),)
 
 def test_handle_file_connection():
     conn = FakeConnection("GET /file HTTP/1.0\r\n\r\n")
-    expected_return = 'HTTP/1.0 200 OK\r\n' + \
+    expected_return = ('HTTP/1.0 200 OK\r\n' + \
                       'Content-type: text/html\r\n' + \
                       '\r\n' + \
-                      '<h1>file path!</h1>'
+                      '<h1>file path!</h1>')
     server.handle_connection(conn)
     assert conn.sent == expected_return, 'Got: %s' % (repr(conn.sent),)
 
@@ -84,3 +86,14 @@ def test_handle_post_request():
     server.handle_connection(conn)
     assert conn.sent == expected_return, 'Got: %s' % (repr(conn.sent),)
 
+def test_handle_form_connection():
+    conn = FakeConnection("GET /form HTTP/1.0\r\n\r\n")
+    expected_return = ("HTTP/1.0 200 OK\r\n" + \
+                       "Content-type: text/html\r\n"
+                       "<form action='/submit' method='GET'>" +  \
+                       "<input type='text' name='firstname'>" + \
+                       "<input type='text' name='lastname'>" + \
+                       "</form>")
+
+    server.handle_connection(conn)
+    assert conn.sent == expected_return, 'Got: %s' % (repr(conn.sent),)
