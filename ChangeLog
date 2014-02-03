@@ -6,6 +6,10 @@
  * hw2, added some unit tests
 
 2014-01-28
-
  * fixed HW2 - added ability handle POST requests
    and added test case for POSTs
+
+2014-01-30
+ * Added form submissions for both GET/POST
+ * Refactored main()
+ * Fixed/added test cases for the form
