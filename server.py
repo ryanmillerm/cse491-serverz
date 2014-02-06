@@ -2,6 +2,8 @@
 import random
 import socket
 import urlparse
+import cgi
+import urllib2
 
 
 def main():
@@ -61,25 +63,42 @@ def generate_form_page(*args):
 
 def generate_form_submission_page(*args):
         conn = args[0]
+        headers = {}
         socket_data = args[1]
+        fp = urllib2.StringIO(socket_data)
         parsed_url = urlparse.urlparse(socket_data)
-        try:
-            #protect against empty inputs
-            first_name = urlparse.parse_qs(parsed_url.query)['firstname'][0]
-            last_name = urlparse.parse_qs(parsed_url.query)['lastname'][0]
-            conn.send('HTTP/1.0 200 OK\r\n')
-            conn.send('Content-type: text/html\r\n')
-            conn.send('\r\n')
-            conn.send('<h1>Hi %s %s</h1>' % (first_name, last_name))
-        except:
-            #if except block is hit, one or more of the fields were empty
-            conn.send('HTTP/1.0 200 OK\r\n')
-            conn.send('Content-type: text/html\r\n')
-            conn.send('\r\n')
-            conn.send('<h1>Warning, first and last name must be entered</h1>')
-            #@question - why does following link not direct to the home
-            #page on the first attempt, but does on the 2nd attempt?
-            #conn.send('<a href=/>Home</a>')
+        trimmed_url_list = parsed_url.query.split("\r\n\r\n")
+        header_list = trimmed_url_list[0].split("\r\n")
+        print header_list
+        for entry in header_list:
+            try:
+                entry = entry.split(' ')
+                headers[entry[0]] = entry[1]
+            except:
+                print 'Error parsing header dictionary. url:', parsed_url
+        field_storage = cgi.FieldStorage(fp, headers)
+        print socket_data
+        if 'enctype:' in field_storage.headers.keys():
+            if field_storage.headers['enctype:'] == 'multipart/form-data':
+                print 'multiformdata!'
+        else:
+            try:
+                #protect against empty inputs
+                first_name = urlparse.parse_qs(parsed_url.query)['firstname'][0]
+                last_name = urlparse.parse_qs(parsed_url.query)['lastname'][0]
+                conn.send('HTTP/1.0 200 OK\r\n')
+                conn.send('Content-type: text/html\r\n')
+                conn.send('\r\n')
+                conn.send('<h1>Hi %s %s</h1>' % (first_name, last_name))
+            except:
+                #if except block is hit, one or more of the fields were empty
+                conn.send('HTTP/1.0 200 OK\r\n')
+                conn.send('Content-type: text/html\r\n')
+                conn.send('\r\n')
+                conn.send('<h1>Warning, first and last name must be entered</h1>')
+                #@question - why does following link not direct to the home
+                #page on the first attempt, but does on the 2nd attempt?
+                #conn.send('<a href=/>Home</a>')
 
 
 def generate_home_page(*args):
@@ -126,7 +145,17 @@ def generate_post_form_page(*args):
 
 
 def handle_connection(conn):
-    socket_data = conn.recv(1000)
+    sentinel_value = '\r\n\r\n'
+    current_string = ''
+    socket_data = ''
+    while sentinel_value != current_string:
+        current_char = conn.recv(1)
+        if current_char == '\r' or current_char == '\n':
+            socket_data += current_char
+            current_string += current_char
+        else:
+            socket_data += current_char
+            current_string = ''
 
     if 'POST /form' in socket_data:
         generate_post_form_page(conn, socket_data)
@@ -149,5 +178,6 @@ def handle_connection(conn):
 
 if __name__ == '__main__':
     main()
+
 
 
