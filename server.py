@@ -4,7 +4,9 @@ import socket
 import urlparse
 import cgi
 import urllib2
+import render
 
+RSP_SUCC_HDR = 'HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n'
 
 def main():
     s = socket.socket()         # Create a socket object
@@ -27,26 +29,29 @@ def main():
 
 def generate_content_page(*args):
         conn = args[0]
-        conn.send('HTTP/1.0 200 OK\r\n')
-        conn.send('Content-type: text/html\r\n')
-        conn.send('\r\n')
-        conn.send('<h1>Content path!</h1>')
+        file_object = open('templates/contentPage.html')
+        html_content = file_object.read()
+        file_object.close()
+        conn.send(RSP_SUCC_HDR)
+        conn.send(html_content)
 
 
 def generate_file_page(*args):
         conn = args[0]
-        conn.send('HTTP/1.0 200 OK\r\n')
-        conn.send('Content-type: text/html\r\n')
-        conn.send('\r\n')
-        conn.send('<h1>file path!</h1>')
+        file_object = open('templates/filePage.html')
+        html_content = file_object.read()
+        file_object.close()
+        conn.send(RSP_SUCC_HDR)
+        conn.send(html_content)
 
 
 def generate_image_page(*args):
         conn = args[0]
-        conn.send('HTTP/1.0 200 OK\r\n')
-        conn.send('Content-type: text/html\r\n')
-        conn.send('\r\n')
-        conn.send('<h1>image path!</h1>')
+        file_object = open('templates/imagePage.html')
+        html_content = file_object.read()
+        file_object.close()
+        conn.send(RSP_SUCC_HDR)
+        conn.send(html_content)
 
 
 def generate_form_page(*args):

@@ -57,7 +57,7 @@ def test_handle_content_connection():
                        '<h1>Content path!</h1>')
 
     server.handle_connection(conn)
-    assert conn.sent == expected_return, 'Got: %s' % (repr(conn.sent),)
+    assert expected_return in conn.sent, 'Got: %s' % (repr(conn.sent),)
 
 
 def test_handle_file_connection():
@@ -67,7 +67,7 @@ def test_handle_file_connection():
                        '\r\n'
                        '<h1>file path!</h1>')
     server.handle_connection(conn)
-    assert conn.sent == expected_return, 'Got: %s' % (repr(conn.sent),)
+    assert expected_return in conn.sent, 'Got: %s' % (repr(conn.sent),)
 
 
 def test_handle_image_connection():
@@ -78,7 +78,7 @@ def test_handle_image_connection():
                        '<h1>image path!</h1>')
 
     server.handle_connection(conn)
-    assert conn.sent == expected_return, 'Got: %s' % (repr(conn.sent),)
+    assert expected_return in conn.sent, 'Got: %s' % (repr(conn.sent),)
 
 
 def test_handle_post_request():
