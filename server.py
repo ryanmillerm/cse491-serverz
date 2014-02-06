@@ -149,6 +149,15 @@ def generate_post_form_page(*args):
             conn.send('<h1>Warning, first and last name must be entered</h1>')
 
 
+def generate_404_page(*args):
+        conn = args[0]
+        conn.send(RSP_SUCC_HDR)
+        # image credit to finerminds.com
+        conn.send('<body><img ')
+        conn.send('src="http://www.finerminds.com/wp-content')
+        conn.send('/blogs.dir/33/files/2011/01/404-cat.png">')
+        conn.send('</body>')
+
 def handle_connection(conn):
     sentinel_value = '\r\n\r\n'
     current_string = ''
@@ -176,8 +185,10 @@ def handle_connection(conn):
         generate_form_page(conn)
     elif '/submit?' in socket_data:
         generate_form_submission_page(conn, socket_data)
-    else:
+    elif 'GET / ' in socket_data:
         generate_home_page(conn, socket_data)
+    else:
+        generate_404_page(conn)
     conn.close()
 
 

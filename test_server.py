@@ -154,3 +154,11 @@ def test_handle_form_invalid_submission():
 
     server.handle_connection(conn)
     assert conn.sent == expected_return, 'Got: %s' % (repr(conn.sent),)
+
+    
+def test_handle_form_invalid_submission():
+    conn = FakeConnection("GET /iAmAGoon HTTP/1.0\r\n\r\n")
+    expected_return = ('src="http://www.finerminds.com')
+
+    server.handle_connection(conn)
+    assert expected_return in conn.sent, 'Got: %s' % (repr(conn.sent),)
