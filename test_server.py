@@ -57,7 +57,7 @@ def test_handle_content_connection():
                        '<h1>Content path!</h1>')
 
     server.handle_connection(conn)
-    assert conn.sent == expected_return, 'Got: %s' % (repr(conn.sent),)
+    assert expected_return in conn.sent, 'Got: %s' % (repr(conn.sent),)
 
 
 def test_handle_file_connection():
@@ -67,7 +67,7 @@ def test_handle_file_connection():
                        '\r\n'
                        '<h1>file path!</h1>')
     server.handle_connection(conn)
-    assert conn.sent == expected_return, 'Got: %s' % (repr(conn.sent),)
+    assert expected_return in conn.sent, 'Got: %s' % (repr(conn.sent),)
 
 
 def test_handle_image_connection():
@@ -78,7 +78,7 @@ def test_handle_image_connection():
                        '<h1>image path!</h1>')
 
     server.handle_connection(conn)
-    assert conn.sent == expected_return, 'Got: %s' % (repr(conn.sent),)
+    assert expected_return in conn.sent, 'Got: %s' % (repr(conn.sent),)
 
 
 def test_handle_post_request():
@@ -123,11 +123,23 @@ def test_handle_form_valid_submission():
 
 def test_handle_form_post():
     conn = FakeConnection("POST /form/submit? HTTP/1.0"
-                          "&firstname=Ryan&lastname=Miller")
+                          "&firstname=Ryan&lastname=Miller\r\n\r\n")
     expected_return = ('HTTP/1.0 200 OK\r\n' +
                        'Content-type: text/html\r\n' +
                        '\r\n' +
-                       '<h1>Hi Ryan Miller</h1>')
+                       '<h1>Hi Ryan Miller\r\n\r\n</h1>')
+
+    server.handle_connection(conn)
+    assert conn.sent == expected_return, 'Got: %s' % (repr(conn.sent),)
+
+
+def test_handle_form_post_invalid():
+    conn = FakeConnection("POST /form/submit? HTTP/1.0"
+                          "&firstname=&lastname=\r\n\r\n")
+    expected_return = ('HTTP/1.0 200 OK\r\n' +
+                       'Content-type: text/html\r\n' +
+                       '\r\n' +
+                       '<h1>Warning, first and last name must be entered</h1>')
 
     server.handle_connection(conn)
     assert conn.sent == expected_return, 'Got: %s' % (repr(conn.sent),)
@@ -143,4 +155,10 @@ def test_handle_form_invalid_submission():
     server.handle_connection(conn)
     assert conn.sent == expected_return, 'Got: %s' % (repr(conn.sent),)
 
+    
+def test_handle_form_invalid_submission():
+    conn = FakeConnection("GET /iAmAGoon HTTP/1.0\r\n\r\n")
+    expected_return = ('src="http://www.finerminds.com')
 
+    server.handle_connection(conn)
+    assert expected_return in conn.sent, 'Got: %s' % (repr(conn.sent),)

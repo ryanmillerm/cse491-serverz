@@ -13,3 +13,9 @@
  * Added form submissions for both GET/POST
  * Refactored main()
  * Fixed/added test cases for the form
+
+ 2014-02-06
+ * Added 404 page
+ * Added a few template pages
+ * Adjusted c.recv to accept any data size
+ * Added test cases for new content
